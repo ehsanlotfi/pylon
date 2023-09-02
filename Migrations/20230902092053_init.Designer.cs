@@ -12,8 +12,8 @@ using pylon.Data;
 namespace pylon.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230831062001_Init2")]
-    partial class Init2
+    [Migration("20230902092053_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

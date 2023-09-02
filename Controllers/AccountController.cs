@@ -3,11 +3,20 @@ using Api.Models;
 using Api.Services;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using System;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Security.Claims;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Api.Controllers
 {
@@ -43,7 +52,7 @@ namespace Api.Controllers
         [HttpGet("refresh-user-token")]
         public async Task<ActionResult<UserDto>> RefreshUserToken()
         {
-            var user = await _userManager.FindByEmailAsync("mail");
+            var user = await _userManager.FindByNameAsync(User.FindFirst(ClaimTypes.Email)?.Value);
 
             if (await _userManager.IsLockedOutAsync(user))
             {
@@ -70,13 +79,13 @@ namespace Api.Controllers
             if (!result.Succeeded)
             {
                 // User has input an invalid password
-                if (!user.UserName.Equals(_config["IDP:AdminUserName"]))
+                if (!user.UserName.Equals(_config["Role:AdminUserName"]))
                 {
                     // Increamenting AccessFailedCount of the AspNetUser by 1
                     await _userManager.AccessFailedAsync(user);
                 }
 
-                if (user.AccessFailedCount >= int.Parse(_config["IDP:MaximumLoginAttempts"]))
+                if (user.AccessFailedCount >=int.Parse(_config["Role:MaximumLoginAttempts"]))
                 {
                     // Lock the user for one day
                     await _userManager.SetLockoutEndDateAsync(user, DateTime.UtcNow.AddDays(1));
@@ -96,7 +105,7 @@ namespace Api.Controllers
         [HttpPost("login-with-third-party")]
         public async Task<ActionResult<UserDto>> LoginWithThirdParty(LoginWithExternalDto model)
         {
-            if (model.Provider.Equals(_config["IDP:Provider:FACEBOOK"]))
+            if (model.Provider.Equals(_config["Facebook"]))
             {
                 try
                 {
@@ -110,7 +119,7 @@ namespace Api.Controllers
                     return Unauthorized("Unable to login with facebook");
                 }
             }
-            else if(model.Provider.Equals(_config["IDP:Provider:GOOGLE"]))
+            else if(model.Provider.Equals(_config["Google"]))
             {
                 try
                 {
@@ -155,7 +164,7 @@ namespace Api.Controllers
             var result = await _userManager.CreateAsync(userToAdd, model.Password);
 
             if (!result.Succeeded) return BadRequest(result.Errors);
-            await _userManager.AddToRoleAsync(userToAdd, _config["IDP:Role:Viewver"]);
+            await _userManager.AddToRoleAsync(userToAdd, SD.PlayerRole);
 
             try
             {
@@ -176,7 +185,7 @@ namespace Api.Controllers
         [HttpPost("register-with-third-party")]
         public async Task<ActionResult<UserDto>> RegisterWithThirdParty(RegisterWithExternal model)
         {
-            if (model.Provider.Equals(_config["IDP:Provide:Facebook"]))
+            if (model.Provider.Equals(_config["Facebook"]))
             {
                 try
                 {
@@ -190,7 +199,7 @@ namespace Api.Controllers
                     return Unauthorized("Unable to register with facebook");
                 }
             }
-            else if (model.Provider.Equals(_config["IDP:Provide:Google"]))
+            else if (model.Provider.Equals(_config["Google"]))
             {
                 try
                 {
@@ -222,7 +231,7 @@ namespace Api.Controllers
 
             var result = await _userManager.CreateAsync(userToAdd);
             if (!result.Succeeded) return BadRequest(result.Errors);
-            await _userManager.AddToRoleAsync(userToAdd, _config["IDP:Role:Viewver"]);
+            await _userManager.AddToRoleAsync(userToAdd, SD.PlayerRole);
 
             return await CreateApplicationUserDto(userToAdd);
         }
@@ -329,6 +338,7 @@ namespace Api.Controllers
             }
         }
 
+        #region Private Helper Methods
         private async Task<UserDto> CreateApplicationUserDto(User user)
         {
             return new UserDto
@@ -379,6 +389,7 @@ namespace Api.Controllers
             return await _emailService.SendEmailAsync(emailSend);
         }
 
+
         private async Task<bool> FacebookValidatedAsync(string accessToken, string userId)
         {
             var facebookKeys = _config["Facebook:AppId"] + "|" + _config["Facebook:AppSecret"];
@@ -426,5 +437,8 @@ namespace Api.Controllers
             return true;
         }
 
+
+     
+        #endregion
     }
 }
