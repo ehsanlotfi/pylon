@@ -9,13 +9,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using System;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Api.Controllers
@@ -31,8 +29,8 @@ namespace Api.Controllers
         private readonly IConfiguration _config;
         private readonly HttpClient _facebookHttpClient;
 
-        public AccountController(JWTService jwtService, 
-            SignInManager<User> signInManager, 
+        public AccountController(JWTService jwtService,
+            SignInManager<User> signInManager,
             UserManager<User> userManager,
             EmailService emailService,
             IConfiguration config)
@@ -61,8 +59,8 @@ namespace Api.Controllers
             return await CreateApplicationUserDto(user);
         }
 
-        [HttpPost("login")]
-        public async Task<ActionResult<UserDto>> Login(LoginDto model)
+        [HttpPost]
+        public async Task<ActionResult<UserDto>> Login([FromForm] LoginDto model)
         {
             var user = await _userManager.FindByNameAsync(model.UserName);
             if (user == null) return Unauthorized("Invalid username or password");
@@ -79,13 +77,13 @@ namespace Api.Controllers
             if (!result.Succeeded)
             {
                 // User has input an invalid password
-                if (!user.UserName.Equals(_config["Role:AdminUserName"]))
+                if (!user.UserName.Equals(SD.AdminUserName))
                 {
                     // Increamenting AccessFailedCount of the AspNetUser by 1
                     await _userManager.AccessFailedAsync(user);
                 }
 
-                if (user.AccessFailedCount >=int.Parse(_config["Role:MaximumLoginAttempts"]))
+                if (user.AccessFailedCount >= SD.MaximumLoginAttempts)
                 {
                     // Lock the user for one day
                     await _userManager.SetLockoutEndDateAsync(user, DateTime.UtcNow.AddDays(1));
@@ -101,11 +99,18 @@ namespace Api.Controllers
 
             return await CreateApplicationUserDto(user);
         }
+        [Authorize]
+        [HttpGet]
+        public async Task<ActionResult<UserDto>> Userinfo()
+        {
+            var user=await _userManager.GetUserAsync(User);
+            return Ok(user);
+        }
 
         [HttpPost("login-with-third-party")]
         public async Task<ActionResult<UserDto>> LoginWithThirdParty(LoginWithExternalDto model)
         {
-            if (model.Provider.Equals(_config["Facebook"]))
+            if (model.Provider.Equals(SD.Facebook))
             {
                 try
                 {
@@ -119,7 +124,7 @@ namespace Api.Controllers
                     return Unauthorized("Unable to login with facebook");
                 }
             }
-            else if(model.Provider.Equals(_config["Google"]))
+            else if (model.Provider.Equals(SD.Google))
             {
                 try
                 {
@@ -128,7 +133,7 @@ namespace Api.Controllers
                         return Unauthorized("Unable to login with google");
                     }
                 }
-                catch(Exception)
+                catch (Exception)
                 {
                     return Unauthorized("Unable to login with google");
                 }
@@ -162,7 +167,6 @@ namespace Api.Controllers
 
             // creates a user inside our AspNetUsers table inside our database
             var result = await _userManager.CreateAsync(userToAdd, model.Password);
-
             if (!result.Succeeded) return BadRequest(result.Errors);
             await _userManager.AddToRoleAsync(userToAdd, SD.PlayerRole);
 
@@ -170,22 +174,22 @@ namespace Api.Controllers
             {
                 if (await SendConfirmEMailAsync(userToAdd))
                 {
-                    return Ok(new JsonResult(new {title = "Account Created", message = "Your account has been created, please confrim your email address" }));
+                    return Ok(new JsonResult(new { title = "Account Created", message = "Your account has been created, please confrim your email address" }));
                 }
 
                 return BadRequest("Failed to send email. Please contact admin");
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return BadRequest("Failed to send email. Please contact admin");
             }
-            
+
         }
 
         [HttpPost("register-with-third-party")]
         public async Task<ActionResult<UserDto>> RegisterWithThirdParty(RegisterWithExternal model)
         {
-            if (model.Provider.Equals(_config["Facebook"]))
+            if (model.Provider.Equals(SD.Facebook))
             {
                 try
                 {
@@ -194,12 +198,12 @@ namespace Api.Controllers
                         return Unauthorized("Unable to register with facebook");
                     }
                 }
-                catch(Exception)
+                catch (Exception)
                 {
                     return Unauthorized("Unable to register with facebook");
                 }
             }
-            else if (model.Provider.Equals(_config["Google"]))
+            else if (model.Provider.Equals(SD.Google))
             {
                 try
                 {
@@ -208,7 +212,7 @@ namespace Api.Controllers
                         return Unauthorized("Unable to register with google");
                     }
                 }
-                catch(Exception)
+                catch (Exception)
                 {
                     return Unauthorized("Unable to register with google");
                 }
@@ -257,7 +261,7 @@ namespace Api.Controllers
 
                 return BadRequest("Invalid token. Please try again");
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return BadRequest("Invalid token. Please try again");
             }
@@ -281,7 +285,7 @@ namespace Api.Controllers
 
                 return BadRequest("Failed to send email. PLease contact admin");
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return BadRequest("Failed to send email. PLease contact admin");
             }
@@ -306,7 +310,7 @@ namespace Api.Controllers
 
                 return BadRequest("Failed to send email. Please contact admin");
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return BadRequest("Failed to send email. Please contact admin");
             }
@@ -332,7 +336,7 @@ namespace Api.Controllers
 
                 return BadRequest("Invalid token. Please try again");
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return BadRequest("Invalid token. Please try again");
             }
@@ -343,9 +347,9 @@ namespace Api.Controllers
         {
             return new UserDto
             {
-                FirstName= user.FirstName,
-                LastName= user.LastName,
-                JWT = await _jwtService.CreateJWT(user),
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                access_token = await _jwtService.CreateJWT(user),
             };
         }
 
@@ -389,13 +393,12 @@ namespace Api.Controllers
             return await _emailService.SendEmailAsync(emailSend);
         }
 
-
         private async Task<bool> FacebookValidatedAsync(string accessToken, string userId)
         {
             var facebookKeys = _config["Facebook:AppId"] + "|" + _config["Facebook:AppSecret"];
             var fbResult = await _facebookHttpClient.GetFromJsonAsync<FacebookResultDto>($"debug_token?input_token={accessToken}&access_token={facebookKeys}");
 
-            if(fbResult == null || fbResult.Data.Is_Valid == false || !fbResult.Data.User_Id.Equals(userId))
+            if (fbResult == null || fbResult.Data.Is_Valid == false || !fbResult.Data.User_Id.Equals(userId))
             {
                 return false;
             }
@@ -436,9 +439,6 @@ namespace Api.Controllers
 
             return true;
         }
-
-
-     
         #endregion
     }
 }

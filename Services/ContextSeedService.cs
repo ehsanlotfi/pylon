@@ -1,7 +1,8 @@
-﻿using Api.Models;
+﻿using Api.Data;
+using Api.Models;
+//using Api.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using pylon.Data;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -10,21 +11,17 @@ namespace Api.Services
 {
     public class ContextSeedService
     {
-        private readonly DatabaseContext _context;
+        private readonly Context _context;
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly IConfiguration _config;
 
-        public ContextSeedService(
-            DatabaseContext context,
-            IConfiguration config,
+        public ContextSeedService(Context context,
             UserManager<User> userManager,
             RoleManager<IdentityRole> roleManager)
         {
             _context = context;
             _userManager = userManager;
             _roleManager = roleManager;
-            _config = config;
         }
 
         public async Task InitializeContextAsync()
@@ -37,9 +34,9 @@ namespace Api.Services
 
             if (!_roleManager.Roles.Any())
             {
-                await _roleManager.CreateAsync(new IdentityRole { Name = _config["IDP:Role:Admin"] });
-                await _roleManager.CreateAsync(new IdentityRole { Name = _config["IDP:Role:Editor"] });
-                await _roleManager.CreateAsync(new IdentityRole { Name = _config["IDP:Role:Viewver"] });
+                await _roleManager.CreateAsync(new IdentityRole { Name = SD.AdminRole });
+                await _roleManager.CreateAsync(new IdentityRole { Name = SD.ManagerRole });
+                await _roleManager.CreateAsync(new IdentityRole { Name = SD.PlayerRole });
             }
 
             if (!_userManager.Users.AnyAsync().GetAwaiter().GetResult())
@@ -48,12 +45,12 @@ namespace Api.Services
                 {
                     FirstName = "admin",
                     LastName = "jackson",
-                    UserName = _config["IDP:AdminUserName"],
-                    Email = _config["IDP:AdminUserName"],
+                    UserName = SD.AdminUserName,
+                    Email = SD.AdminUserName,
                     EmailConfirmed = true
                 };
                 await _userManager.CreateAsync(admin, "123456");
-                await _userManager.AddToRolesAsync(admin, new[] { _config["IDP:Role:Admin"], _config["IDP:Role:Editor"], _config["IDP:Role:Viewver"] });
+                await _userManager.AddToRolesAsync(admin, new[] { SD.AdminRole, SD.ManagerRole, SD.PlayerRole });
                 await _userManager.AddClaimsAsync(admin, new Claim[]
                 {
                     new Claim(ClaimTypes.Email, admin.Email),
@@ -69,7 +66,7 @@ namespace Api.Services
                     EmailConfirmed = true
                 };
                 await _userManager.CreateAsync(manager, "123456");
-                await _userManager.AddToRoleAsync(manager, _config["IDP:Role:Editor"]);
+                await _userManager.AddToRoleAsync(manager, SD.ManagerRole);
                 await _userManager.AddClaimsAsync(manager, new Claim[]
                 {
                     new Claim(ClaimTypes.Email, manager.Email),
@@ -85,7 +82,7 @@ namespace Api.Services
                     EmailConfirmed = true
                 };
                 await _userManager.CreateAsync(player, "123456");
-                await _userManager.AddToRoleAsync(player, _config["IDP:Role:Viewver"]);
+                await _userManager.AddToRoleAsync(player, SD.PlayerRole);
                 await _userManager.AddClaimsAsync(player, new Claim[]
                 {
                     new Claim(ClaimTypes.Email, player.Email),
@@ -101,7 +98,7 @@ namespace Api.Services
                     EmailConfirmed = true
                 };
                 await _userManager.CreateAsync(vipplayer, "123456");
-                await _userManager.AddToRoleAsync(vipplayer, _config["IDP:Role:Viewver"]);
+                await _userManager.AddToRoleAsync(vipplayer, SD.PlayerRole);
                 await _userManager.AddClaimsAsync(vipplayer, new Claim[]
                 {
                     new Claim(ClaimTypes.Email, vipplayer.Email),

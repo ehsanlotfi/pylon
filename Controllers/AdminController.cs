@@ -19,14 +19,12 @@ namespace Api.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly IConfiguration _config;
+
         public AdminController(UserManager<User> userManager,
-            RoleManager<IdentityRole> roleManager,
-            IConfiguration config)
+            RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _roleManager = roleManager;
-            _config = config;
         }
 
         [HttpGet("get-members")]
@@ -34,7 +32,7 @@ namespace Api.Controllers
         {
             List<MemberViewDto> members = new List<MemberViewDto>();
             var users = await _userManager.Users
-                .Where(x => x.UserName != _config["Role:AdminUserName"])
+                .Where(x => x.UserName != SD.AdminUserName)
                 .ToListAsync();
 
             foreach(var user in users)
@@ -60,7 +58,7 @@ namespace Api.Controllers
         public async Task<ActionResult<MemberAddEditDto>> GetMember(string id)
         {
             var user = await _userManager.Users
-                .Where(x => x.UserName != _config["Role:AdminUserName"] && x.Id == id)
+                .Where(x => x.UserName != SD.AdminUserName && x.Id == id)
                 .FirstOrDefaultAsync();
 
             var member = new MemberAddEditDto
@@ -115,7 +113,7 @@ namespace Api.Controllers
 
                 if (IsAdminUserId(model.Id))
                 {
-                    return BadRequest(_config["Role:SuperAdminChangeNotAllowed"]);
+                    return BadRequest(SD.SuperAdminChangeNotAllowed);
                 }
 
                 user = await _userManager.FindByIdAsync(model.Id);
@@ -164,7 +162,7 @@ namespace Api.Controllers
 
             if (IsAdminUserId(id))
             {
-                return BadRequest(_config["Role:SuperAdminChangeNotAllowed"]);
+                return BadRequest(SD.SuperAdminChangeNotAllowed);
             }
 
             await _userManager.SetLockoutEndDateAsync(user, DateTime.UtcNow.AddDays(5));
@@ -179,7 +177,7 @@ namespace Api.Controllers
 
             if (IsAdminUserId(id))
             {
-                return BadRequest(_config["Role:SuperAdminChangeNotAllowed"]);
+                return BadRequest(SD.SuperAdminChangeNotAllowed);
             }
 
             await _userManager.SetLockoutEndDateAsync(user, null);
@@ -194,7 +192,7 @@ namespace Api.Controllers
 
             if (IsAdminUserId(id))
             {
-                return BadRequest(_config["Role:SuperAdminChangeNotAllowed"]);
+                return BadRequest(SD.SuperAdminChangeNotAllowed);
             }
 
             await _userManager.DeleteAsync(user);
@@ -209,7 +207,7 @@ namespace Api.Controllers
 
         private bool IsAdminUserId(string userId)
         {
-            return _userManager.FindByIdAsync(userId).GetAwaiter().GetResult().UserName.Equals(_config["Role:AdminUserName"]);
+            return _userManager.FindByIdAsync(userId).GetAwaiter().GetResult().UserName.Equals(SD.AdminUserName);
         }
     }
 }
