@@ -1,4 +1,4 @@
-﻿namespace Api.DTOs.Account
+﻿namespace pylon.DTOs.Account
 {
     public class FacebookResultDto
     {

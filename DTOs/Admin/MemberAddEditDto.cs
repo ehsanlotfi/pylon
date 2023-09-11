@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Api.DTOs.Admin
+namespace pylon.DTOs.Admin
 {
     public class MemberAddEditDto
     {

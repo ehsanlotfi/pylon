@@ -1,8 +1,9 @@
-﻿using Api.Models;
+﻿using pylon.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace Api.Data
+namespace pylon.Data
 {
     public class Context : IdentityDbContext<User>
     {
@@ -10,5 +11,7 @@ namespace Api.Data
         {
 
         }
+
+      
     }
 }

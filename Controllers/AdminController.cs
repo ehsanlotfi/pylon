@@ -1,5 +1,5 @@
-﻿using Api.DTOs.Admin;
-using Api.Models;
+﻿using pylon.DTOs.Admin;
+using pylon.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Api.Controllers
+namespace pylon.Controllers
 {
     [Authorize(Roles = "Admin")]
     [Route("api/[controller]")]

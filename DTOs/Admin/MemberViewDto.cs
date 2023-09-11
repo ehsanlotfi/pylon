@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Api.DTOs.Admin
+namespace pylon.DTOs.Admin
 {
     public class MemberViewDto
     {

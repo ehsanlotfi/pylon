@@ -1,5 +1,5 @@
-﻿using Api.Data;
-using Api.Models;
+﻿using pylon.Data;
+using pylon.Models;
 //using Api.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace Api.Services
+namespace pylon.Services
 {
     public class ContextSeedService
     {

@@ -1,6 +1,6 @@
-﻿using Api.DTOs.Account;
-using Api.Models;
-using Api.Services;
+﻿using pylon.DTOs.Account;
+using pylon.Models;
+using pylon.Services;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -16,7 +16,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Api.Controllers
+namespace pylon.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -48,7 +48,7 @@ namespace Api.Controllers
 
         [Authorize]
         [HttpGet("refresh-user-token")]
-        public async Task<ActionResult<UserDto>> RefreshUserToken()
+        public async Task<ActionResult<InfoModel>> RefreshUserToken()
         {
             var user = await _userManager.FindByNameAsync(User.FindFirst(ClaimTypes.Email)?.Value);
 
@@ -60,7 +60,7 @@ namespace Api.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<UserDto>> Login([FromForm] LoginDto model)
+        public async Task<ActionResult<InfoModel>> Login([FromForm] LoginDto model)
         {
             var user = await _userManager.FindByNameAsync(model.UserName);
             if (user == null) return Unauthorized("Invalid username or password");
@@ -101,14 +101,25 @@ namespace Api.Controllers
         }
         [Authorize]
         [HttpGet]
-        public async Task<ActionResult<UserDto>> Userinfo()
+        public async Task<ActionResult<InfoModel>> Userinfo()
         {
             var user=await _userManager.GetUserAsync(User);
-            return Ok(user);
+
+            return Ok(new InfoModel
+            {
+                Info=new UserDto
+                {
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    sub = user.Id
+                },
+                access_token = await _jwtService.CreateJWT(user),
+              
+            });
         }
 
         [HttpPost("login-with-third-party")]
-        public async Task<ActionResult<UserDto>> LoginWithThirdParty(LoginWithExternalDto model)
+        public async Task<ActionResult<InfoModel>> LoginWithThirdParty(LoginWithExternalDto model)
         {
             if (model.Provider.Equals(SD.Facebook))
             {
@@ -187,7 +198,7 @@ namespace Api.Controllers
         }
 
         [HttpPost("register-with-third-party")]
-        public async Task<ActionResult<UserDto>> RegisterWithThirdParty(RegisterWithExternal model)
+        public async Task<ActionResult<InfoModel>> RegisterWithThirdParty(RegisterWithExternal model)
         {
             if (model.Provider.Equals(SD.Facebook))
             {
@@ -343,13 +354,19 @@ namespace Api.Controllers
         }
 
         #region Private Helper Methods
-        private async Task<UserDto> CreateApplicationUserDto(User user)
+        private async Task<InfoModel> CreateApplicationUserDto(User user)
         {
-            return new UserDto
+            return new InfoModel
             {
-                FirstName = user.FirstName,
-                LastName = user.LastName,
+                Info = new UserDto
+                {
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    sub = user.Id,
+                    exp= 1694417151,
+                },
                 access_token = await _jwtService.CreateJWT(user),
+
             };
         }
 

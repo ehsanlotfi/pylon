@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Api.DTOs.Account
+namespace pylon.DTOs.Account
 {
     public class LoginWithExternalDto
     {

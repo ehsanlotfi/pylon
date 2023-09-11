@@ -1,10 +1,10 @@
-﻿using Api.DTOs.Account;
+﻿using pylon.DTOs.Account;
 using Mailjet.Client;
 using Mailjet.Client.TransactionalEmails;
 using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
 
-namespace Api.Services
+namespace pylon.Services
 {
     public class EmailService
     {
