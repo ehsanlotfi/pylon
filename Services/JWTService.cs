@@ -9,6 +9,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.DataProtection;
 
 namespace pylon.Services
 {
@@ -28,6 +29,8 @@ namespace pylon.Services
         }
         public async Task<string> CreateJWT(User user)
         {
+            //var iat = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            //var exp = DateTimeOffset.UtcNow.AddMinutes(2).ToUnixTimeSeconds();
             try
             {
                 var userClaims = new List<Claim>
@@ -35,20 +38,25 @@ namespace pylon.Services
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Email, user.UserName),
                 new Claim(ClaimTypes.GivenName, user.FirstName),
-                new Claim(ClaimTypes.Surname, user.LastName)
+                new Claim(ClaimTypes.Surname, user.LastName),
+              
             };
 
                 var roles = await _userManager.GetRolesAsync(user);
                 userClaims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
-
+  
                 var creadentials = new SigningCredentials(_jwtKey, SecurityAlgorithms.HmacSha512Signature);
+
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
                     Subject = new ClaimsIdentity(userClaims),
                     Expires = DateTime.UtcNow.AddMinutes(2),//AddDays(int.Parse(_config["JWT:ExpiresInDays"])),
                     SigningCredentials = creadentials,
                     Issuer = _config["JWT:Issuer"],
-
+                    TokenType="jwt",
+                    IssuedAt = System.DateTime.UtcNow,
+                    //Claims = payload,
+                    
                 };
 
                 var tokenHandler = new JwtSecurityTokenHandler();
@@ -62,5 +70,6 @@ namespace pylon.Services
             }
          
         }
+
     }
 }
