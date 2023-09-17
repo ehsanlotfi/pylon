@@ -12,6 +12,19 @@ namespace pylon.Data
 
         }
 
-      
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                const string TableNamePrefix = "AspNet";
+                var tableName = entityType.GetTableName();
+                if (tableName.StartsWith(TableNamePrefix))
+                    entityType.SetTableName(tableName.Substring(TableNamePrefix.Length));
+            }
+        }
+
+
     }
 }
