@@ -48,6 +48,12 @@ namespace pylon.Controllers
             };
         }
 
+        [HttpGet("/")]
+        public IActionResult CheckServiceStatus()
+        {
+            return Ok("Service is active!");
+        }
+
         [Authorize]
         [HttpGet("refresh-user-token")]
         public async Task<ActionResult<InfoModel>> RefreshUserToken()
