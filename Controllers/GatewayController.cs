@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using pylon.Models;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -27,11 +28,11 @@ namespace gateway.Controllers
             using (SqlConnection connection = new SqlConnection(_config["ConnectionStrings:DefaultConnection"]))
             {
                 connection.Open();
-                string StoredProcedureName = path.Replace("-", "_");
+                string StoredProcedureName = "sps_" + path;
 
                 if(CheckStoredProcedure(connection, StoredProcedureName))
                 {
-                    using (SqlCommand command = new SqlCommand(path.Replace("-", "_"), connection))
+                    using (SqlCommand command = new SqlCommand("sps_" + path, connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
 
@@ -93,10 +94,26 @@ namespace gateway.Controllers
                     string procedureName = row["ROUTINE_NAME"].ToString();
                     List<SqlParameterInfo> parameters = GetStoredProcedureParameters(connection, procedureName);
 
+
+                    List<Dictionary<string, object>> model = new List<Dictionary<string, object>>();
+
+                    Dictionary<string, object> modelItem = new Dictionary<string, object>();
+                    for (int i = 0; i < parameters.Count; i++)
+                    {
+                        modelItem.Add(parameters[i].ParameterName.Substring(1), MapSqlTypeToTypeScriptType(parameters[i].ParameterType));
+                    }
+
+                    model.Add(modelItem);
+
+                    StringBuilder Url = new StringBuilder();
+                    Url.Append(_config["Site:Origin"]);
+                    Url.Append("api/");
+                    Url.Append(procedureName.Substring(4));
+
                     procedureInfoList.Add(new StoredProcedureInfo
                     {
-                        Url =  procedureName.Replace("-", "_"),
-                        Model = parameters
+                        Url = Url.ToString(),
+                        Model = model
                     });
                 }
             }
@@ -134,6 +151,49 @@ namespace gateway.Controllers
                 int count = (int)checkCommand.ExecuteScalar();
 
                 return count > 0;
+            }
+        }
+
+        private static readonly Dictionary<string, string> TypeMapping = new Dictionary<string, string>
+            {
+                { "bigint", "number" },
+                { "binary", "Uint8Array" },
+                { "bit", "boolean" },
+                { "char", "string" },
+                { "date", "Date" },
+                { "datetime", "Date" },
+                { "decimal", "number" },
+                { "float", "number" },
+                { "int", "number" },
+                { "money", "number" },
+                { "nchar", "string" },
+                { "ntext", "string" },
+                { "numeric", "number" },
+                { "nvarchar", "string" },
+                { "real", "number" },
+                { "smalldatetime", "Date" },
+                { "smallint", "number" },
+                { "smallmoney", "number" },
+                { "text", "string" },
+                { "time", "Date" },
+                { "timestamp", "Date" },
+                { "tinyint", "number" },
+                { "uniqueidentifier", "string" },
+                { "varbinary", "Uint8Array" },
+                { "varchar", "string" },
+       
+            };
+
+        private static string MapSqlTypeToTypeScriptType(string sqlType)
+        {
+            if (TypeMapping.TryGetValue(sqlType.ToLower(), out string tsType))
+            {
+                return tsType;
+            }
+            else
+            {
+                // Handle unsupported types or custom mappings here
+                throw new NotSupportedException($"Mapping for SQL type '{sqlType}' to TypeScript type is not defined.");
             }
         }
 

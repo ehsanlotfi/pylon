@@ -9,7 +9,7 @@ namespace pylon.Models
     public class StoredProcedureInfo
     {
         public string Url { get; set; }
-        public List<SqlParameterInfo> Model { get; set; }
+        public List<Dictionary<string, object>> Model { get; set; }
     }
 
     public class SqlParameterInfo
