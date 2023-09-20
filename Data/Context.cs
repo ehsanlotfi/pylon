@@ -24,6 +24,7 @@ namespace pylon.Data
                     entityType.SetTableName(tableName.Substring(TableNamePrefix.Length));
             }
         }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
 
     }

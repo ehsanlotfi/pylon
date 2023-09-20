@@ -17,6 +17,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Google.Apis.Auth.OAuth2;
 using Newtonsoft.Json.Linq;
+using pylon.Data;
 
 namespace pylon.Controllers
 {
@@ -30,17 +31,19 @@ namespace pylon.Controllers
         private readonly EmailService _emailService;
         private readonly IConfiguration _config;
         private readonly HttpClient _facebookHttpClient;
-
+        private readonly Context _context;
         public AccountController(JWTService jwtService,
             SignInManager<User> signInManager,
             UserManager<User> userManager,
             EmailService emailService,
+            Context context,
             IConfiguration config)
         {
             _jwtService = jwtService;
             _signInManager = signInManager;
             _userManager = userManager;
             _emailService = emailService;
+            _context = context;
             _config = config;
             _facebookHttpClient = new HttpClient
             {
@@ -55,8 +58,25 @@ namespace pylon.Controllers
         }
 
         [Authorize]
-        [HttpGet("refresh-user-token")]
-        public async Task<ActionResult<InfoModel>> RefreshUserToken()
+        [HttpPost("refresh-token")]
+        public async Task<ActionResult<InfoModel>> RefereshToken()
+        {
+            var token = Request.Cookies["identityAppRefreshToken"];
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (IsValidRefreshTokenAsync(userId, token).GetAwaiter().GetResult())
+            {
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null) return Unauthorized("Invalid or expired token, please try to login");
+                return await CreateApplicationUserDto(user);
+            }
+
+            return Unauthorized("Invalid or expired token, please try to login");
+        }
+
+        [Authorize]
+        [HttpGet("refresh-page")]
+        public async Task<ActionResult<InfoModel>> RefreshPage()
         {
             var user = await _userManager.FindByNameAsync(User.FindFirst(ClaimTypes.Email)?.Value);
 
@@ -108,47 +128,7 @@ namespace pylon.Controllers
             return await CreateApplicationUserDto(user);
         }
 
-    
-        [HttpGet("login")]
-        public async Task<ActionResult<InfoModel>> Login(string email, string password, string id)
-        {
-            var user = await _userManager.FindByNameAsync(email);
-            if (user == null) return Unauthorized("Invalid username or password");
 
-            if (user.EmailConfirmed == false) return Unauthorized("Please confirm your email.");
-
-            var result = await _signInManager.CheckPasswordSignInAsync(user, password, false);
-
-            if (result.IsLockedOut)
-            {
-                return Unauthorized(string.Format("Your account has been locked. You should wait until {0} (UTC time) to be able to login", user.LockoutEnd));
-            }
-
-            if (!result.Succeeded)
-            {
-                // User has input an invalid password
-                if (!user.UserName.Equals(SD.AdminUserName))
-                {
-                    // Increamenting AccessFailedCount of the AspNetUser by 1
-                    await _userManager.AccessFailedAsync(user);
-                }
-
-                if (user.AccessFailedCount >= SD.MaximumLoginAttempts)
-                {
-                    // Lock the user for one day
-                    await _userManager.SetLockoutEndDateAsync(user, DateTime.UtcNow.AddDays(1));
-                    return Unauthorized(string.Format("Your account has been locked. You should wait until {0} (UTC time) to be able to login", user.LockoutEnd));
-                }
-
-
-                return Unauthorized("Invalid username or password");
-            }
-
-            await _userManager.ResetAccessFailedCountAsync(user);
-            await _userManager.SetLockoutEndDateAsync(user, null);
-
-            return await CreateApplicationUserDto(user);
-        }
 
 
         [Authorize]
@@ -405,10 +385,48 @@ namespace pylon.Controllers
                 return BadRequest("Invalid token. Please try again");
             }
         }
+        private async Task SaveRefreshTokenAsync(User user)
+        {
+            var refreshToken = _jwtService.CreateRefreshToken(user);
 
+            var existingRefreshToken = await _context.RefreshTokens.SingleOrDefaultAsync(x => x.UserId == user.Id);
+            if (existingRefreshToken != null)
+            {
+                existingRefreshToken.Token = refreshToken.Token;
+                existingRefreshToken.DateCreatedUtc = refreshToken.DateCreatedUtc;
+                existingRefreshToken.DateExpiresUtc = refreshToken.DateExpiresUtc;
+            }
+            else
+            {
+                user.RefreshTokens.Add(refreshToken);
+            }
+
+            await _context.SaveChangesAsync();
+
+            var cookieOptions = new CookieOptions
+            {
+                Expires = refreshToken.DateExpiresUtc,
+                IsEssential = true,
+                HttpOnly = true,
+            };
+
+            Response.Cookies.Append("identityAppRefreshToken", refreshToken.Token, cookieOptions);
+        }
+        public async Task<bool> IsValidRefreshTokenAsync(string userId, string token)
+        {
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token)) return false;
+
+            var fetchedRefreshToken = await _context.RefreshTokens
+                .FirstOrDefaultAsync(x => x.UserId == userId && x.Token == token);
+            if (fetchedRefreshToken == null) return false;
+            if (fetchedRefreshToken.IsExpired) return false;
+
+            return true;
+        }
         #region Private Helper Methods
         private async Task<InfoModel> CreateApplicationUserDto(User user)
         {
+            await SaveRefreshTokenAsync(user);
             return new InfoModel
             {
                 Info = new UserDto
