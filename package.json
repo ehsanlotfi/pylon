@@ -1,0 +1,10 @@
+{
+    "name": "pylon",
+    "scripts": {
+        "publish": "dotnet publish -c Release -r win-x64 --output D:/developing/publish pylon.sln"
+      },
+      "volta": {
+        "node": "18.16.0",
+        "npm": "9.6.6"
+      }
+}
