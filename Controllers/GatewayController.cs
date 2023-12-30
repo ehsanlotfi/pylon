@@ -25,9 +25,13 @@ namespace gateway.Controllers
         {
             List<Dictionary<string, object>> results = new List<Dictionary<string, object>>();
 
-            using (SqlConnection connection = new SqlConnection(_config["ConnectionStrings:DefaultConnection"]))
+            using (SqlConnection connection = new SqlConnection(_config["ConnectionStrings:ApiConnection"]))
             {
-                connection.Open();
+                if (!IsHealthyConnection(connection))
+                {
+                    return StatusCode(422, "Connection is wrong!");
+                }
+
                 string StoredProcedureName = "sps_" + path;
 
                 if(CheckStoredProcedure(connection, StoredProcedureName))
@@ -83,9 +87,12 @@ namespace gateway.Controllers
         {
             List<StoredProcedureInfo> procedureInfoList = new List<StoredProcedureInfo>();
 
-            using (SqlConnection connection = new SqlConnection(_config["ConnectionStrings:DefaultConnection"]))
+            using (SqlConnection connection = new SqlConnection(_config["ConnectionStrings:ApiConnection"]))
             {
-                connection.Open();
+                if(!IsHealthyConnection(connection))
+                {
+                    return StatusCode(422, "Connection is wrong!");
+                }
 
                 DataTable schemaTable = connection.GetSchema("Procedures");
 
@@ -195,6 +202,19 @@ namespace gateway.Controllers
                 // Handle unsupported types or custom mappings here
                 throw new NotSupportedException($"Mapping for SQL type '{sqlType}' to TypeScript type is not defined.");
             }
+        }
+
+        private static bool IsHealthyConnection(SqlConnection connection)
+        {
+                try
+                {
+                    connection.Open();
+                    return true;
+                }
+                catch (SqlException)
+                {
+                    return false;
+                }
         }
 
     }
