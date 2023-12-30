@@ -27,20 +27,21 @@ namespace gateway.Controllers
 
             using (SqlConnection connection = new SqlConnection(_config["ConnectionStrings:ApiConnection"]))
             {
-                if (!IsHealthyConnection(connection))
+                string Healthy = IsHealthyConnection(connection);
+                if (Healthy != "ok")
                 {
-                    return StatusCode(422, "Connection is wrong!");
+                    return StatusCode(422, Healthy);
                 }
 
                 string StoredProcedureName = "sps_" + path;
 
-                if(CheckStoredProcedure(connection, StoredProcedureName))
+                if (CheckStoredProcedure(connection, StoredProcedureName))
                 {
                     using (SqlCommand command = new SqlCommand("sps_" + path, connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
 
-                        if(inputModel != null)
+                        if (inputModel != null)
                         {
                             foreach (var kvp in inputModel)
                             {
@@ -73,7 +74,8 @@ namespace gateway.Controllers
                             return StatusCode(405, "Params is wrong!");
                         }
                     }
-                } else
+                }
+                else
                 {
                     return NotFound();
                 }
@@ -89,9 +91,10 @@ namespace gateway.Controllers
 
             using (SqlConnection connection = new SqlConnection(_config["ConnectionStrings:ApiConnection"]))
             {
-                if(!IsHealthyConnection(connection))
+                string Healthy = IsHealthyConnection(connection);
+                if (Healthy != "ok")
                 {
-                    return StatusCode(422, "Connection is wrong!");
+                    return StatusCode(422, Healthy);
                 }
 
                 DataTable schemaTable = connection.GetSchema("Procedures");
@@ -188,7 +191,7 @@ namespace gateway.Controllers
                 { "uniqueidentifier", "string" },
                 { "varbinary", "Uint8Array" },
                 { "varchar", "string" },
-       
+
             };
 
         private static string MapSqlTypeToTypeScriptType(string sqlType)
@@ -204,17 +207,17 @@ namespace gateway.Controllers
             }
         }
 
-        private static bool IsHealthyConnection(SqlConnection connection)
+        private static string IsHealthyConnection(SqlConnection connection)
         {
-                try
-                {
-                    connection.Open();
-                    return true;
-                }
-                catch (SqlException)
-                {
-                    return false;
-                }
+            try
+            {
+                connection.Open();
+                return "ok";
+            }
+            catch (Exception e)
+            {
+                return e.Message;
+            }
         }
 
     }
