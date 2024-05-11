@@ -14,6 +14,13 @@ namespace pylon.Models
 
     public class SqlParameterInfo
     {
+        public string ProcedureName { get; set; }
+        public string ParameterName { get; set; }
+        public string ParameterType { get; set; }
+    }
+    public class StoredProcedure
+    {
+        public string ProcedureName { get; set; }
         public string ParameterName { get; set; }
         public string ParameterType { get; set; }
     }

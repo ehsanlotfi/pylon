@@ -1,10 +1,14 @@
+using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.OpenApi.Models;
 using pylon.Models;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -85,8 +89,15 @@ namespace gateway.Controllers
         }
 
         [HttpGet("api/list")]
-        public IActionResult GetStoredProcedures()
+        [ProducesResponseType(typeof(OpenApiDocument), 200)]
+        public async Task<IActionResult> GetStoredProceduresAsync()
         {
+            var openApiDoc = new OpenApiDocument
+            {
+                Info = new OpenApiInfo { Title = "Stored Procedures API", Version = "v1" },
+                Paths = new OpenApiPaths()
+            };
+
             List<StoredProcedureInfo> procedureInfoList = new List<StoredProcedureInfo>();
 
             using (SqlConnection connection = new SqlConnection(_config["ConnectionStrings:ApiConnection"]))
@@ -97,60 +108,80 @@ namespace gateway.Controllers
                     return StatusCode(422, Healthy);
                 }
 
-                DataTable schemaTable = connection.GetSchema("Procedures");
+                List<StoredProcedure> storedProcedures = await GetStoredProceduresAsync(connection);
 
-                foreach (DataRow row in schemaTable.Rows)
+                List<string> storedProceduresUniq = storedProcedures.Select(item => item.ProcedureName)
+                                    .Distinct()
+                                    .ToList();
+
+
+                foreach (var procedure in storedProceduresUniq)
                 {
-                    string procedureName = row["ROUTINE_NAME"].ToString();
-                    List<SqlParameterInfo> parameters = GetStoredProcedureParameters(connection, procedureName);
-
-
-                    List<Dictionary<string, object>> model = new List<Dictionary<string, object>>();
-
-                    Dictionary<string, object> modelItem = new Dictionary<string, object>();
-                    for (int i = 0; i < parameters.Count; i++)
+                    var operation = new OpenApiOperation
                     {
-                        modelItem.Add(parameters[i].ParameterName.Substring(1), MapSqlTypeToTypeScriptType(parameters[i].ParameterType));
+                        Summary = $"Execute stored procedure {procedure}",
+                        Description = $"Execute stored procedure {procedure}",
+                        Responses = new OpenApiResponses
+                        {
+                            ["200"] = new OpenApiResponse
+                            {
+                                Description = "Successful operation"
+                            }
+                        }
+                    };
+
+                    Add parameters to the operation
+                    foreach (var parameter in storedProcedures.Where(x => x.ProcedureName == procedure))
+                    {
+                        operation.Parameters.Add(new OpenApiParameter
+                        {
+                            Name = parameter.ParameterName,
+                            In = ParameterLocation.Query,
+                            Required = true,
+                            Schema = new OpenApiSchema { Type = parameter.ParameterType }
+                        });
                     }
 
-                    model.Add(modelItem);
-
-                    StringBuilder Url = new StringBuilder();
-                    Url.Append(_config["Site:Origin"]);
-                    Url.Append("api/");
-                    Url.Append(procedureName.Substring(4));
-
-                    procedureInfoList.Add(new StoredProcedureInfo
+                    // Add operation to the path
+                    openApiDoc.Paths.Add($"/api/{procedure.ToLower()}", new OpenApiPathItem
                     {
-                        Url = Url.ToString(),
-                        Model = model
+                        Operations = new Dictionary<OperationType, OpenApiOperation>
+                        {
+                            [OperationType.Get] = operation
+                        }
                     });
                 }
+
             }
 
-            return Ok(procedureInfoList);
+            return Ok(openApiDoc);
+
         }
 
-        private List<SqlParameterInfo> GetStoredProcedureParameters(SqlConnection connection, string procedureName)
+        public static async Task<List<StoredProcedure>> GetStoredProceduresAsync(SqlConnection connection)
         {
-            List<SqlParameterInfo> parameterInfoList = new List<SqlParameterInfo>();
-
-            DataTable schemaTable = connection.GetSchema("ProcedureParameters", new string[] { null, null, procedureName });
-
-            foreach (DataRow row in schemaTable.Rows)
-            {
-                string parameterName = row["PARAMETER_NAME"].ToString();
-                string parameterType = row["DATA_TYPE"].ToString();
-
-                parameterInfoList.Add(new SqlParameterInfo
-                {
-                    ParameterName = parameterName,
-                    ParameterType = parameterType
-                });
-            }
-
-            return parameterInfoList;
+            string query = @"
+            SELECT 
+                p.name AS ProcedureName,
+                pp.name AS ParameterName,
+                t.name AS ParameterType
+            FROM 
+                sys.procedures p
+            JOIN 
+                sys.parameters pp ON p.object_id = pp.object_id
+            JOIN
+                sys.types t ON pp.system_type_id = t.system_type_id
+            WHERE 
+                p.name LIKE 'sps_%' AND t.name <> 'sysname'";
+            return (await connection.QueryAsync<StoredProcedure>(query)).AsList();
         }
+
+        public class SqlParameterInfo
+        {
+            public string ParameterName { get; set; }
+            public string ParameterType { get; set; }
+        }
+
 
         private bool CheckStoredProcedure(SqlConnection connection, string storedProcedureName)
         {
