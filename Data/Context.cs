@@ -25,6 +25,7 @@ namespace pylon.Data
             }
         }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<WS> WS { get; set; }
 
 
     }

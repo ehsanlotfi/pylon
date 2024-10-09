@@ -1,0 +1,48 @@
+<div class="container">
+    <h2>{{ isEditMode ? 'Edit' : 'Create' }} API Gateway</h2>
+    <form (ngSubmit)="onSubmit()">
+        <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" id="title" [(ngModel)]="ws.title" name="title" class="form-control" required />
+        </div>
+
+        <div class="form-group">
+            <label for="type">Type</label>
+            <input type="text" id="type" [(ngModel)]="ws.type" name="type" class="form-control" required />
+        </div>
+
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" [(ngModel)]="ws.name" name="name" class="form-control" required />
+        </div>
+
+        <div class="form-group">
+            <label for="service">Service</label>
+            <input type="text" id="service" [(ngModel)]="ws.service" name="service" class="form-control" required />
+        </div>
+
+        <div class="form-group">
+            <label for="category">Category</label>
+            <input type="text" id="category" [(ngModel)]="ws.category" name="category" class="form-control" required />
+        </div>
+
+        <div class="form-group">
+            <label for="method">Method</label>
+            <input type="text" id="method" [(ngModel)]="ws.method" name="method" class="form-control" required />
+        </div>
+
+        <div class="form-group">
+            <label for="rateLimit">Rate Limit</label>
+            <input type="number" id="rateLimit" [(ngModel)]="ws.rateLimit" name="rateLimit" class="form-control"
+                required />
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" [(ngModel)]="ws.description" name="description" class="form-control"
+                required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">{{ isEditMode ? 'Update' : 'Create' }}</button>
+    </form>
+</div>

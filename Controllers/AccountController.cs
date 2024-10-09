@@ -412,7 +412,7 @@ namespace pylon.Controllers
 
             Response.Cookies.Append("identityAppRefreshToken", refreshToken.Token, cookieOptions);
         }
-        public async Task<bool> IsValidRefreshTokenAsync(string userId, string token)
+        private async Task<bool> IsValidRefreshTokenAsync(string userId, string token)
         {
             if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token)) return false;
 

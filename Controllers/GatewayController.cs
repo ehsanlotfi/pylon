@@ -130,7 +130,7 @@ namespace gateway.Controllers
                         }
                     };
 
-                    Add parameters to the operation
+                    //Add parameters to the operation
                     foreach (var parameter in storedProcedures.Where(x => x.ProcedureName == procedure))
                     {
                         operation.Parameters.Add(new OpenApiParameter
