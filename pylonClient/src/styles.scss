@@ -1,5 +1,7 @@
 @import 'bootstrap/scss/bootstrap';
 @import "@ng-select/ng-select/themes/default.theme.css";
+@import 'ag-grid-community/styles/ag-grid.css';
+@import 'ag-grid-community/styles/ag-theme-quartz.css';
 
 :root {
     --bg-color: #1B1A55;
@@ -41,4 +43,8 @@
         height: calc(100vh - 4rem);
         flex-grow: 1;
     }
+}
+
+.aggrid-container {
+    height: calc(100vh - 6rem)
 }

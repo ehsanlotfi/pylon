@@ -8,6 +8,10 @@ export const routes: Routes = [
     },
     {
         path: "home",
-        loadComponent: () => import('./pages/ws-form/web-service-form.component').then(mod => mod.WebServiceFormComponent)
+        loadComponent: () => import('./pages/ws-form/ws-form.component').then(mod => mod.WSFormComponent)
+    },
+    {
+        path: "ws-list",
+        loadComponent: () => import('./pages/ws-list/ws-list.component').then(mod => mod.WSListComponent)
     },
 ];

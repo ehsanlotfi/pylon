@@ -5,6 +5,7 @@ export class WSModel
     name: string = "";
     service: string = "";
     category: string = "";
+    executionTarget: string = "";
     method: number = 0; // 0 = POST, 1 = GET, 2 = PUT, 3 = PATCH, 4 = DELETE, 5 = HEAD, 6 = OPTION
     isQueryParams: boolean = false;
     isAuthentication: boolean = false;

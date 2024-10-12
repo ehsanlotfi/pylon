@@ -34,6 +34,7 @@ namespace pylon.Models
         public string Name { get; set; }
         public string Service { get; set; }
         public string Category { get; set; }
+        public string ExecutionTarget { get; set; }
         public WSMethod Method { get; set; } 
         public bool IsQueryParams { get; set; }
         public bool IsAuthentication { get; set; }

@@ -1,2 +1,2 @@
-export * from './ws-form/web-service-form.component';
-export * from './ws-list/web-services.component';
+export * from './ws-form/ws-form.component';
+export * from './ws-list/ws-list.component';

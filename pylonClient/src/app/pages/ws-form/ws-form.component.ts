@@ -8,7 +8,7 @@ import * as _mdl from '@app/models/index';
 import * as _svc from '@app/services/index';
 
 @Component({
-  selector: 'app-web-service-form',
+  selector: 'app-ws-form',
   standalone: true,
   imports: [
     RouterOutlet,
@@ -19,9 +19,9 @@ import * as _svc from '@app/services/index';
     NgOptionTemplateDirective,
     NgSelectComponent],
   providers: [_svc.WSService],
-  templateUrl: './web-service-form.component.html',
+  templateUrl: './ws-form.component.html',
 })
-export class WebServiceFormComponent
+export class WSFormComponent
 {
   ws: _mdl.WSModel = new _mdl.WSModel();
   isEditMode: boolean = false;
