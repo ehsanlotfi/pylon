@@ -1,12 +1,11 @@
 export class WSModel
 {
     id: number = 0;
-    type: string = "StoreProcedure"; // SQLQuery, StoreProcedure, Service
-    title: string = "";
+    type: number = 0; // 0 = StoreProcedure, 1 = SQLQuery, 2 = WEBService
     name: string = "";
     service: string = "";
     category: string = "";
-    method: string = "POST"; // POST, GET, PUT, PATCH, DELETE, HEAD, OPTION
+    method: number = 0; // 0 = POST, 1 = GET, 2 = PUT, 3 = PATCH, 4 = DELETE, 5 = HEAD, 6 = OPTION
     isQueryParams: boolean = false;
     isAuthentication: boolean = false;
     params: string = "";
@@ -17,7 +16,7 @@ export class WSModel
     payloads: string = "";
     cacheTimeout: number = 0;
     isEnablead: boolean = false;
-    status: string = "Draft"; // Draft, Published, Remove
+    status: number = 1; // 0 = Remove, 1 = Draft, 2 = Published
     setUserParams: boolean = false;
     rateLimit: number = 0; // Request limit per minute/hour
     description: string = "";

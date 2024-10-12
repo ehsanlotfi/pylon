@@ -2,22 +2,33 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
+import { NgLabelTemplateDirective, NgOptionTemplateDirective, NgSelectComponent } from '@ng-select/ng-select';
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import * as _mdl from '@app/models/index';
 import * as _svc from '@app/services/index';
-import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-web-service-form',
   standalone: true,
-  imports: [RouterOutlet, NgbDropdownModule, CommonModule, FormsModule],
+  imports: [
+    RouterOutlet,
+    NgbDropdownModule,
+    CommonModule,
+    FormsModule,
+    NgLabelTemplateDirective,
+    NgOptionTemplateDirective,
+    NgSelectComponent],
   providers: [_svc.WSService],
   templateUrl: './web-service-form.component.html',
-  styles: ``
 })
 export class WebServiceFormComponent
 {
   ws: _mdl.WSModel = new _mdl.WSModel();
   isEditMode: boolean = false;
+
+  selectedCar?: number;
+  services = [];
+  categories = [];
 
   constructor(
     private _WSSvc: _svc.WSService,

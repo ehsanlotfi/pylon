@@ -21,6 +21,7 @@
     "@angular/router": "^18.2.0",
     "@fortawesome/fontawesome-free": "6.6.0",
     "@ng-bootstrap/ng-bootstrap": "^17.0.1",
+    "@ng-select/ng-select": "^13.9.1",
     "@popperjs/core": "^2.11.8",
     "@rollup/rollup-win32-x64-msvc": "^4.21.3",
     "ag-grid-angular": "32.1.0",

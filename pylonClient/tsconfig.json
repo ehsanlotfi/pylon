@@ -25,7 +25,7 @@
     ],
     "paths": {
       "@app/*": [
-        "src/app/*"
+        "./src/app/*"
       ]
     }
   },

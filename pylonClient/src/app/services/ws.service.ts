@@ -6,7 +6,7 @@ import * as _mdl from '@app/models/index';
 @Injectable()
 export class WSService
 {
-    private apiUrl = 'http://localhost:5000/api/WS'; // Change to your API URL
+    private apiUrl = 'http://localhost:5010/api/WS';
 
     constructor(private http: HttpClient) { }
 
