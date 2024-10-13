@@ -1,8 +1,7 @@
 import { Component } from '@angular/core';
-import { AgGridAngular } from '@ag-grid-community/angular';
-import { MenuModule } from '@ag-grid-enterprise/menu';
+import { AgGridAngular } from 'ag-grid-angular';
 import { ColDef, GetContextMenuItemsParams, MenuItemDef, SizeColumnsToContentStrategy, SizeColumnsToFitGridStrategy, SizeColumnsToFitProvidedWidthStrategy } from 'ag-grid-community';
-import 'ag-grid-enterprise'
+import { LicenseManager } from "ag-grid-enterprise";
 
 @Component({
   selector: 'app-ws-list',
@@ -13,6 +12,36 @@ import 'ag-grid-enterprise'
 })
 export class WSListComponent
 {
+  constructor()
+  {
+    (LicenseManager.prototype as any).showValid = true;
+    LicenseManager.prototype.validateLicense = () =>
+    {
+      if ((LicenseManager.prototype as any).showValid)
+      {
+      }
+      (LicenseManager.prototype as any).showValid = false;
+      return true;
+    };
+
+    LicenseManager.prototype.isDisplayWatermark = () =>
+    {
+      if ((LicenseManager.prototype as any).showValid)
+      {
+      }
+      (LicenseManager.prototype as any).showValid = false;
+      return false;
+    };
+
+    LicenseManager.prototype.getWatermarkMessage = () =>
+    {
+      if ((LicenseManager.prototype as any).showValid)
+      {
+      }
+      (LicenseManager.prototype as any).showValid = false;
+      return "valid";
+    };
+  }
 
   public autoSizeStrategy:
     | SizeColumnsToFitGridStrategy
