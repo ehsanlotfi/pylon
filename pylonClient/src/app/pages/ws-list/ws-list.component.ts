@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
-import { AgGridAngular } from 'ag-grid-angular';
+import { AgGridAngular } from '@ag-grid-community/angular';
+import { MenuModule } from '@ag-grid-enterprise/menu';
 import { ColDef, GetContextMenuItemsParams, MenuItemDef, SizeColumnsToContentStrategy, SizeColumnsToFitGridStrategy, SizeColumnsToFitProvidedWidthStrategy } from 'ag-grid-community';
 import 'ag-grid-enterprise'
-import { MenuModule } from '@ag-grid-enterprise/menu';
 
 @Component({
   selector: 'app-ws-list',
