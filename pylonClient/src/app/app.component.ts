@@ -51,6 +51,8 @@ export const menuItems = [
 export class AppComponent
 {
   isLightMode = false;
+  isRtlMode = false;
+
   menuItems = menuItems;
 
   toggleDarkMode()
