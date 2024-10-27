@@ -1,1 +1,85 @@
-/* You can add global styles to this file, and also import other style files */
+@import 'bootstrap/scss/bootstrap';
+@import "@ng-select/ng-select/themes/default.theme.css";
+@import 'ag-grid-community/styles/ag-grid.css';
+@import 'ag-grid-community/styles/ag-theme-quartz.css';
+@import '@fortawesome/fontawesome-free/css/all.min.css';
+
+html[data-bs-theme=dark] * {
+    --bg-color: #1B1A55;
+    --text-color: #ddd;
+    --primary-color: #007bff;
+    --secondary-color: #adb5bd;
+    --navbar-bg-color: #212529;
+    --sidebar-bg-color: #2d333b;
+    --content-bg-color: #3a3f44;
+    --bs-navbar-brand-color: #fff;
+}
+
+/* Dark mode variables */
+html[data-bs-theme=light] * {
+    --bg-color: #ffffff;
+    --text-color: #000000;
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --navbar-bg-color: #f8f9fa;
+    --sidebar-bg-color: #f1f1f1;
+    --content-bg-color: #ffffff;
+}
+
+html[dir=ltr] {
+    direction: ltr !important;
+}
+
+html[dir=rtl] {
+    direction: rtl !important;
+}
+
+.app-container {
+    color: var(--text-color);
+
+    * {
+        color: var(--text-color) !important;
+
+    }
+
+    input,
+    input:focus,
+    ng-select * {
+        background-color: var(--content-bg-color) !important;
+    }
+
+    .btn {
+        border-color: var(--secondary-color);
+        background-color: var(--primary-color);
+    }
+
+    .hover {
+        cursor: pointer;
+    }
+
+    .fa-1-5x {
+        font-size: 1.5rem;
+    }
+
+    nav.app-navbar {
+        background-color: var(--navbar-bg-color) !important;
+        height: 4rem;
+    }
+
+    .app-sidebar {
+        background-color: var(--sidebar-bg-color) !important;
+        height: calc(100vh - 4rem);
+        width: 250px;
+    }
+
+    .app-content {
+        background-color: var(--content-bg-color) !important;
+        height: calc(100vh - 4rem);
+        flex-grow: 1;
+    }
+
+}
+
+.aggrid-container {
+    height: calc(100vh - 6rem)
+}

@@ -1,0 +1,29 @@
+<div class="container">
+    <h2>{{ isEditMode ? 'Edit' : 'Create' }} Web Services</h2>
+    <form (ngSubmit)="onSubmit()">
+
+        <div class="form-group">
+            <label for="title">Service</label>
+            <ng-select [items]="services" name="service" [addTag]="true" required [(ngModel)]="ws.service">
+            </ng-select>
+        </div>
+
+        <div class="form-group">
+            <label for="title">Category</label>
+            <ng-select [items]="categories" name="category" [addTag]="true" required [(ngModel)]="ws.category">
+            </ng-select>
+        </div>
+
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" [(ngModel)]="ws.name" name="name" class="form-control" required />
+        </div>
+
+        <div class="form-group">
+            <label for="name">Execution Target</label>
+            <input type="text" [(ngModel)]="ws.executionTarget" name="executionTarget" class="form-control" required />
+        </div>
+
+        <button type="submit" class="btn btn-theme">{{ isEditMode ? 'Update' : 'Create' }}</button>
+    </form>
+</div>
