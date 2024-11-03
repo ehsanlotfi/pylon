@@ -17,17 +17,16 @@ export const menuItems = [
     "children": []
   },
   {
-    "title": "Users",
+    "title": "Services",
     "icon": "bi bi-people",
-    "link": "#",
     "children": [
       {
-        "title": "Add User",
-        "link": "/users/add"
+        "title": "All Service",
+        "link": "services"
       },
       {
-        "title": "Manage Users",
-        "link": "/users/manage"
+        "title": "Add Service",
+        "link": "services/form"
       }
     ]
   },
@@ -52,23 +51,22 @@ export const menuItems = [
   selector: 'app-root',
   template: `
         <div class="app-container">
-        <nav class="app-navbar navbar navbar-expand-lg navbar-light bg-light">
+        <header class="app-navbar navbar navbar-expand-lg px-3">
           <a class="navbar-brand" href="#">Admin Panel</a>
-        </nav>
+        </header>
         <div class="d-flex">
-          <!-- Sidebar -->
-          <div class="app-sidebar bg-light border-right">
+          <div class="app-sidebar">
             <ul class="nav flex-column">
-              <li *ngFor="let item of menuItems" class="nav-item">
+              <li *ngFor="let menu of menuItems" class="nav-item">
                 <div class="nav-link" ngbDropdown>
-                  <i class="{{ item.icon }}"></i> {{ item.title }}
-                  <ng-container *ngIf="item.children.length > 0">
+                    {{ menu.title }}
+                  <ng-container *ngIf="menu.children.length">
                     <span class="dropdown-toggle"></span>
                   </ng-container>
                 </div>
-                <ul *ngIf="item.children.length > 0" class="nav flex-column ml-3">
-                  <li *ngFor="let child of item.children" class="nav-item">
-                    <a class="nav-link" href="{{ child.link }}">{{ child.title }}</a>
+                <ul *ngIf="menu.children.length" class="nav flex-column ms-3">
+                  <li *ngFor="let child of menu.children" class="nav-item">
+                    <a class="nav-link" [routerLink]="child.link">{{ child.title }}</a>
                   </li>
                 </ul>
               </li>
@@ -106,11 +104,11 @@ const routes: Routes = [
     pathMatch: "full"
   },
   {
-    path: "home",
+    path: "services/form",
     component: _page.WSFormComponent
   },
   {
-    path: "ws-list",
+    path: "services",
     component: _page.WSListComponent
   },
 ];

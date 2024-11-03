@@ -10,8 +10,9 @@ html[data-bs-theme=dark] * {
     --primary-color: #007bff;
     --secondary-color: #adb5bd;
     --navbar-bg-color: #212529;
-    --sidebar-bg-color: #2d333b;
-    --content-bg-color: #3a3f44;
+    --sidebar-bg-color: #152234;
+    --header-bg-color: #161d27;
+    --content-bg-color: #1f2936;
     --bs-navbar-brand-color: #fff;
 }
 
@@ -23,6 +24,7 @@ html[data-bs-theme=light] * {
     --secondary-color: #6c757d;
     --navbar-bg-color: #f8f9fa;
     --sidebar-bg-color: #f1f1f1;
+    --header-bg-color: #f1f1f1;
     --content-bg-color: #ffffff;
 }
 
@@ -35,11 +37,15 @@ html[dir=rtl] {
 }
 
 .app-container {
+
     color: var(--text-color);
 
     * {
         color: var(--text-color) !important;
+    }
 
+    header {
+        background-color: var(--header-bg-color);
     }
 
     input,
