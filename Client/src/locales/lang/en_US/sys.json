@@ -127,6 +127,10 @@
 					}
 				}
 			},
+			"AGS" :{
+				"index": "Services",
+				"manage": "Management Services"
+			},
 			"disabled": "Item Disabled",
 			"label": "Item Label",
 			"frame": "Item External",

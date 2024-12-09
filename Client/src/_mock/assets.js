@@ -390,6 +390,29 @@ const MENU_LEVEL_PERMISSION = {
 		},
 	],
 };
+
+const AGS_PERMISSION = {
+	id: "0194818428516575001",
+	parentId: "",
+	label: "sys.menu.AGS.index",
+	name: "AGS",
+	icon: "bxs:error-alt",
+	type: PermissionType.CATALOGUE,
+	route: "ags",
+	order: 2,
+	children: [
+		{
+			id: "0194818428516575002",
+			parentId: "0194818428516575001",
+			label: "sys.menu.AGS.manage",
+			name: "manage",
+			type: PermissionType.MENU,
+			route: "manage",
+			component: "/AGS/manage/index.tsx",
+		}
+	],
+};
+
 const ERRORS_PERMISSION = {
 	id: "9406067785553476",
 	parentId: "",
@@ -517,6 +540,7 @@ const OTHERS_PERMISSION = [
 ];
 
 export const PERMISSION_LIST = [
+	AGS_PERMISSION,
 	DASHBOARD_PERMISSION,
 	MANAGEMENT_PERMISSION,
 	COMPONENTS_PERMISSION,
