@@ -268,47 +268,6 @@ function AGSModal({
 			icon: <Iconify icon="solar:user-id-bold" size={24} className="mr-2" />,
 			title: "General",
 			content: <>
-				<Form.Item label="Id" name="Id">
-					<Input />
-				</Form.Item>
-
-				<Form.Item label="Type" name="Type" rules={[{ required: true, message: "Type is required!" }]}>
-					<Select>
-						<Select.Option value="SQLQuery">SQLQuery</Select.Option>
-						<Select.Option value="StoreProcedure">StoreProcedure</Select.Option>
-						<Select.Option value="Service">Service</Select.Option>
-					</Select>
-				</Form.Item>
-
-				<Form.Item label="Title" name="Title" rules={[{ required: true, message: "Title is required!" }]}>
-					<Input />
-				</Form.Item>
-			</>,
-		},
-		{
-			icon: <Iconify icon="mingcute:profile-fill" size={24} className="mr-2" />,
-			title: "Advanced",
-			content: <>
-				<Form.Item label="Id" name="Id">
-					<Input />
-				</Form.Item>
-
-				<Form.Item label="Type" name="Type" rules={[{ required: true, message: "Type is required!" }]}>
-					<Select>
-						<Select.Option value="SQLQuery">SQLQuery</Select.Option>
-						<Select.Option value="StoreProcedure">StoreProcedure</Select.Option>
-						<Select.Option value="Service">Service</Select.Option>
-					</Select>
-				</Form.Item>
-
-				<Form.Item label="Title" name="Title" rules={[{ required: true, message: "Title is required!" }]}>
-					<Input />
-				</Form.Item>
-
-				<Form.Item label="Name" name="Name" rules={[{ required: true, message: "Name is required!" }]}>
-					<Input />
-				</Form.Item>
-
 				<Form.Item label="Service" name="Service">
 					<Input />
 				</Form.Item>
@@ -329,7 +288,28 @@ function AGSModal({
 					</Select>
 				</Form.Item>
 
-				<Form.Item label="Is Query Params" name="IsQueryParams" valuePropName="checked">
+				<Form.Item label="Type" name="Type" rules={[{ required: true, message: "Type is required!" }]}>
+					<Select>
+						<Select.Option value="SQLQuery">SQLQuery</Select.Option>
+						<Select.Option value="StoreProcedure">StoreProcedure</Select.Option>
+						<Select.Option value="Service">Service</Select.Option>
+					</Select>
+				</Form.Item>
+
+				<Form.Item label="Title" name="Title" rules={[{ required: true, message: "Title is required!" }]}>
+					<Input />
+				</Form.Item>
+
+				<Form.Item label="Name" name="Name" rules={[{ required: true, message: "Name is required!" }]}>
+					<Input />
+				</Form.Item>
+			</>,
+		},
+		{
+			icon: <Iconify icon="mingcute:profile-fill" size={24} className="mr-2" />,
+			title: "Advanced",
+			content: <>
+				<Form.Item label="Is QueryParams" name="IsQueryParams" valuePropName="checked">
 					<Switch />
 				</Form.Item>
 
@@ -373,7 +353,7 @@ function AGSModal({
 					</Radio.Group>
 				</Form.Item>
 
-				<Form.Item label="Set User Params" name="SetUserParams">
+				<Form.Item label="User Params" name="SetUserParams">
 					<Input />
 				</Form.Item>
 
@@ -385,11 +365,11 @@ function AGSModal({
 					<Select mode="tags" />
 				</Form.Item>
 
-				<Form.Item label="Sample Input" name="SampleInput">
+				<Form.Item label="Inputs" name="SampleInput">
 					<Input.TextArea />
 				</Form.Item>
 
-				<Form.Item label="Sample Output" name="SampleOutput">
+				<Form.Item label="Outputs" name="SampleOutput">
 					<Input.TextArea />
 				</Form.Item>
 
@@ -437,7 +417,6 @@ function AGSModal({
 			>
 				<div>{tabs[currentTabIndex].content}</div>
 			</Form>
-
 		</Modal>
 	);
 }
