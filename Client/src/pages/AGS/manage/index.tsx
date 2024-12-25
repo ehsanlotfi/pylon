@@ -45,7 +45,7 @@ export default function AGS()
 				Params: '',
 				IsHeaders: false,
 				Headers: '',
-				IsFormData: false,
+				IsFormData: false, 
 				IsPayload: false,
 				Payloads: '',
 				CacheTimeout: 0,
