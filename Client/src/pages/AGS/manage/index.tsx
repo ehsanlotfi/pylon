@@ -31,6 +31,7 @@ type SearchFormFieldType = Pick<IAGS, "Name" | "Status">;
 export default function AGS()
 {
 	const [searchForm] = Form.useForm();
+
 	const [AGSModalPros, setAGSModalProps] =
 		useState<AGSModalProps>({
 			formValue: {
@@ -45,7 +46,7 @@ export default function AGS()
 				Params: '',
 				IsHeaders: false,
 				Headers: '',
-				IsFormData: false, 
+				IsFormData: false,
 				IsPayload: false,
 				Payloads: '',
 				CacheTimeout: 0,
@@ -63,6 +64,7 @@ export default function AGS()
 			show: false,
 			onOk: () =>
 			{
+				debugger
 				setAGSModalProps((prev) => ({ ...prev, show: false }));
 			},
 			onCancel: () =>
@@ -268,11 +270,11 @@ function AGSModal({
 			icon: <Iconify icon="solar:user-id-bold" size={24} className="mr-2" />,
 			title: "General",
 			content: <>
-				<Form.Item label="Service" name="Service">
+				<Form.Item label="Service" name="Service" rules={[{ required: true, message: "Service is required!" }]}>
 					<Input />
 				</Form.Item>
 
-				<Form.Item label="Category" name="Category">
+				<Form.Item label="Category" name="Category" rules={[{ required: true, message: "Category is required!" }]}>
 					<Input />
 				</Form.Item>
 
@@ -309,43 +311,43 @@ function AGSModal({
 			icon: <Iconify icon="mingcute:profile-fill" size={24} className="mr-2" />,
 			title: "Advanced",
 			content: <>
-				<Form.Item label="Is QueryParams" name="IsQueryParams" valuePropName="checked">
+				<Form.Item labelCol={{ span: 6 }} label="Is QueryParams" name="IsQueryParams" valuePropName="checked">
 					<Switch />
 				</Form.Item>
 
-				<Form.Item label="Params" name="Params">
+				<Form.Item labelCol={{ span: 6 }} label="Params" name="Params">
 					<Input />
 				</Form.Item>
 
-				<Form.Item label="Is Headers" name="IsHeaders" valuePropName="checked">
+				<Form.Item labelCol={{ span: 6 }} label="Is Headers" name="IsHeaders" valuePropName="checked">
 					<Switch />
 				</Form.Item>
 
-				<Form.Item label="Headers" name="Headers">
+				<Form.Item labelCol={{ span: 6 }} label="Headers" name="Headers">
 					<Input />
 				</Form.Item>
 
-				<Form.Item label="Is Form Data" name="IsFormData" valuePropName="checked">
+				<Form.Item labelCol={{ span: 6 }} label="Is Form Data" name="IsFormData" valuePropName="checked">
 					<Switch />
 				</Form.Item>
 
-				<Form.Item label="Is Payload" name="IsPayload" valuePropName="checked">
+				<Form.Item labelCol={{ span: 6 }} label="Is Payload" name="IsPayload" valuePropName="checked">
 					<Switch />
 				</Form.Item>
 
-				<Form.Item label="Payloads" name="Payloads">
+				<Form.Item labelCol={{ span: 6 }} label="Payloads" name="Payloads">
 					<Input />
 				</Form.Item>
 
-				<Form.Item label="Cache Timeout" name="CacheTimeout" rules={[{ type: 'number', min: 0, message: "Must be a non-negative number!" }]}>
+				<Form.Item labelCol={{ span: 6 }} label="Cache Timeout" name="CacheTimeout" rules={[{ type: 'number', min: 0, message: "Must be a non-negative number!" }]}>
 					<InputNumber />
 				</Form.Item>
 
-				<Form.Item label="Is Enabled" name="IsEnablead" valuePropName="checked">
+				<Form.Item labelCol={{ span: 6 }} label="Is Enabled" name="IsEnablead" valuePropName="checked">
 					<Switch />
 				</Form.Item>
 
-				<Form.Item label="Status" name="Status" rules={[{ required: true, message: "Status is required!" }]}>
+				<Form.Item labelCol={{ span: 6 }} label="Status" name="Status" rules={[{ required: true, message: "Status is required!" }]}>
 					<Radio.Group>
 						<Radio value="Draft">Draft</Radio>
 						<Radio value="Published">Published</Radio>
@@ -353,31 +355,31 @@ function AGSModal({
 					</Radio.Group>
 				</Form.Item>
 
-				<Form.Item label="User Params" name="SetUserParams">
+				<Form.Item labelCol={{ span: 6 }} label="User Params" name="SetUserParams">
 					<Input />
 				</Form.Item>
 
-				<Form.Item label="Description" name="Description">
+				<Form.Item labelCol={{ span: 6 }} label="Description" name="Description">
 					<Input.TextArea />
 				</Form.Item>
 
-				<Form.Item label="Tags" name="Tags">
+				<Form.Item labelCol={{ span: 6 }} label="Tags" name="Tags">
 					<Select mode="tags" />
 				</Form.Item>
 
-				<Form.Item label="Inputs" name="SampleInput">
+				<Form.Item labelCol={{ span: 6 }} label="Inputs" name="SampleInput">
 					<Input.TextArea />
 				</Form.Item>
 
-				<Form.Item label="Outputs" name="SampleOutput">
+				<Form.Item labelCol={{ span: 6 }} label="Outputs" name="SampleOutput">
 					<Input.TextArea />
 				</Form.Item>
 
-				<Form.Item label="Roles" name="Roles">
+				<Form.Item labelCol={{ span: 6 }} label="Roles" name="Roles">
 					<Select mode="multiple" />
 				</Form.Item>
 
-				<Form.Item label="Version" name="Version">
+				<Form.Item labelCol={{ span: 6 }} label="Version" name="Version">
 					<Input />
 				</Form.Item>
 			</>,
